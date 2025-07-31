@@ -56,7 +56,7 @@ contract EIP7702SessionDelegator {
     /**
      * @notice Allows the main delegator account to register a session key.
      */
-    function startSession(address key, IERC20 _swapToken, uint256 _swapAmount, uint256 _duration) external {
+    function startSession(address key, IERC20 _swapToken, uint256 _swapAmount, uint256 _duration, uint256 _gasFee) external {
         if (msg.sender != address(this)) revert InvalidAuthority();
         if (isExistingKey[key]) revert SessionKeyAlreadyExists();
         if (_duration >= maxSessionDuration) revert InvalidSessionDuration();
@@ -71,8 +71,16 @@ contract EIP7702SessionDelegator {
 
         sessionId++;
 
-        // transfer token to the session key address for the swap
-        SafeTransferLib.safeTransfer(address(_swapToken), key, _swapAmount);
+        if (address(_swapToken) == address(0)) {
+            // transfer native token to the session key address for the swap along with gas fee
+            SafeTransferLib.safeTransferETH(key, _swapAmount + _gasFee);
+        } else {
+            // transfer gas fee 
+            SafeTransferLib.safeTransferETH(key, _gasFee);
+
+            // transfer token to the session key address for the swap
+            SafeTransferLib.safeTransfer(address(_swapToken), key, _swapAmount);
+        }
 
         emit SessionStarted(key, _swapToken, _swapAmount, _duration);
     }
