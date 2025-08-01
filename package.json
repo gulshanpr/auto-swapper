@@ -13,6 +13,7 @@
     "@prisma/client": "^6.13.0",
     "@prisma/extension-accelerate": "^2.0.2",
     "@privy-io/react-auth": "^2.20.0",
+    "crypto": "^1.0.1",
     "dotenv": "^17.2.1",
     "next": "15.4.4",
     "react": "19.1.0",
