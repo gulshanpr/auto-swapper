@@ -5,6 +5,11 @@
   --foreground: #171717;
 }
 
+@theme {
+  --color-blackish: #0a0a0a;
+  --color-offwhite: #e2e8f0;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -19,8 +24,64 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-blackish);
+    color: var(--color-offwhite);
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #4f46e5, #a855f7, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-bg {
+  background-image: radial-gradient(
+      circle at top right,
+      rgba(79, 70, 229, 0.2) 0%,
+      rgba(10, 10, 10, 0) 40%
+    ),
+    radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.15) 0%, rgba(10, 10, 10, 0) 35%);
+}
+
+.gradient-1 {
+  background-image: linear-gradient(90deg, #4f46e5, #a855f7, #ec4899);
+}
+
+.glassy-shadow {
+  box-shadow: 0 4px 24px 0 rgba(79, 70, 229, 0.12), 0 1.5px 6px 0 rgba(236, 72, 153, 0.1);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--color-indigo-500);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--color-indigo-500), 0.6);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-indigo-500) transparent;
 }
