@@ -1,4 +1,3 @@
-// use this when there is no `"type": "module"` in your package.json, i.e. you're using commonjs
 import { SDK, HashLock, PrivateKeyProviderConnector, NetworkEnum } from "@1inch/cross-chain-sdk";
 import { createWalletClient, createPublicClient, http, parseEther, formatEther, getContract } from 'viem';
 import { arbitrum, base } from 'viem/chains';
