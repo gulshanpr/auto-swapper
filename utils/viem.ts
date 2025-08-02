@@ -1,17 +1,17 @@
-// viemConfig.ts
-import { createWalletClient, custom, parseEther } from 'viem';
-import { arbitrumSepolia } from 'viem/chains';
-import { createBundlerClient } from "viem/account-abstraction";
+import { createWalletClient, createPublicClient, custom, http } from 'viem';
+import { baseSepolia } from 'viem/chains';
 
 export function createViemWalletClient(provider: any, wallet: any) {
   return createWalletClient({
     account: wallet.address as `0x${string}`,
-    chain: arbitrumSepolia,
+    chain: baseSepolia,
     transport: custom(provider),
   });
 }
 
-// const bundlerClient = createBundlerClient({
-//   client: publicClient,
-//   transport: http("https://your-bundler-rpc.com"),
-// });
+export const publicClient = createPublicClient({
+  chain: baseSepolia,
+  transport: http(),
+});
+
+export { baseSepolia };
