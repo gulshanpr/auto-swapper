@@ -4,8 +4,8 @@ import Image from "next/image";
 import ConnectWalletButton from "../ConnectWalletButton";
 
 const navItems = [
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Features", href: "#features" },
+  { label: "How It Works", href: "/#how-it-works" },
+  { label: "Features", href: "/#features" },
 ];
 
 const Header = () => {
