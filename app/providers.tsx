@@ -10,7 +10,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       config={{
         embeddedWallets: {
           createOnLogin: "all-users", // 👈 This should create embedded wallets
-          showWalletUIs: false,
+          showWalletUIs: true,
         },
         supportedChains: [baseSepolia], // 👈 Make sure Base Sepolia is included
         loginMethods: ["email", "google"], // 👈 Use these, not external wallets

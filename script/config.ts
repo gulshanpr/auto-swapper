@@ -4,7 +4,7 @@ import { baseSepolia } from 'viem/chains' // or whatever chain you're using
 import { privateKeyToAccount } from 'viem/accounts'
 
 // Your MetaMask EOA that will be delegated
-export const eoaAccount = privateKeyToAccount('') // Your MetaMask private key
+export const eoaAccount = privateKeyToAccount('0xe2a81a98728ac0852f76826099f498f8753d83b9fa1bcc933fb1845ce319a7e2') // Your MetaMask private key
 
 // Your deployed contract address
 export const contractAddress = '0x8A4131A7197fE6fDf638914B8a2d90F7B7198c83'

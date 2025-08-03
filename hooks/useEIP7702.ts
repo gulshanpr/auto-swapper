@@ -5,7 +5,7 @@ import { useWallets } from '@privy-io/react-auth';
 import { useSign7702Authorization } from '@privy-io/react-auth'; // 👈 This is the key!
 import { createViemWalletClient, publicClient } from '@/utils/viem';
 import { CONTRACT_ADDRESS, CONTRACT_ABI, ZERO_ADDRESS } from '@/utils/constants';
-import { parseEther } from 'viem';
+import { createWalletClient, custom, parseEther } from 'viem';
 import { baseSepolia } from '@/utils/viem';
 
 export function useEIP7702() {
@@ -75,103 +75,97 @@ export function useEIP7702() {
   };
 
   // Delegate EOA to contract using Privy embedded wallet
+  // Delegate EOA to contract using Privy embedded wallet
   const delegateToContract = async () => {
-    if (!wallet?.address) throw new Error('No wallet connected');
+    if (!wallet?.address) throw new Error("No wallet connected");
 
     try {
       setLoading(true);
 
-      console.log('=== DELEGATION DEBUG ===');
-      console.log('Wallet address:', wallet.address);
-      console.log('Contract address:', CONTRACT_ADDRESS);
-      console.log('Chain:', baseSepolia.id);
+      console.log("=== DELEGATION DEBUG ===");
+      console.log("Wallet address:", wallet.address);
+      console.log("Contract address:", CONTRACT_ADDRESS);
+      console.log("Chain:", baseSepolia.id);
 
       // Check if this is a Privy embedded wallet
       if (!signAuthorization) {
         throw new Error(
-          'signAuthorization function not available. ' +
-          'Make sure you are using a Privy embedded wallet (email/social login).'
+          "signAuthorization function not available. " +
+          "Make sure you are using a Privy embedded wallet (email/social login)."
         );
       }
 
       // Get current nonce for authorization
       const currentNonce = await publicClient.getTransactionCount({
-        address: wallet.address as `0x${string}`
+        address: wallet.address as `0x${string}`,
       });
-      console.log('Current nonce:', currentNonce);
+      console.log("Current nonce:", currentNonce);
 
-      // Use Privy's signAuthorization (works with embedded EOAs)
-      console.log('Signing authorization...');
+      // Sign authorization for this EOA to delegate to CONTRACT_ADDRESS
+      console.log("Signing authorization...");
       const privyAuth = await signAuthorization({
         contractAddress: CONTRACT_ADDRESS,
         chainId: baseSepolia.id,
-        nonce: currentNonce + 1, // Increment for same-wallet transaction
+        address: wallet.address, // ✅ EOA address
+        nonce: currentNonce, // ✅ exact nonce
       });
 
-      console.log('Privy authorization:', privyAuth);
+      console.log("Privy authorization:", privyAuth);
 
-      // Convert Privy's authorization to Viem's expected format
+      // Build authorization object for viem
       const viemAuthorization = {
         chainId: privyAuth.chainId,
         address: privyAuth.address as `0x${string}`,
         nonce: privyAuth.nonce,
-        // Convert v to yParity (v = 27 + yParity for legacy, but EIP-7702 uses yParity directly)
         yParity: privyAuth.yParity ?? (privyAuth.v === 28n ? 1 : 0),
         r: privyAuth.r as `0x${string}`,
-        s: privyAuth.s as `0x${string}`
+        s: privyAuth.s as `0x${string}`,
       };
+      console.log("Viem authorization:", viemAuthorization);
 
-      console.log('Viem authorization:', viemAuthorization);
-
-      // Get provider and send EIP-7702 transaction
+      // Create a viem wallet client directly from embedded provider
       const provider = await wallet.getEthereumProvider();
-      const walletClient = createViemWalletClient(provider, wallet);
-
-      console.log('Sending EIP-7702 transaction...');
-
-      // Send EIP-7702 transaction with properly formatted authorization
-      const hash = await provider.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: wallet.address,
-          to: wallet.address,
-          value: '0x0',
-          data: '0x',
-          type: '0x4', // EIP-7702 type as hex string
-          authorizationList: [{
-            chainId: `0x${privyAuth.chainId.toString(16)}`, // Convert to hex
-            address: privyAuth.address,
-            nonce: `0x${privyAuth.nonce.toString(16)}`, // Convert to hex
-            yParity: `0x${(privyAuth.yParity ?? (privyAuth.v === 28n ? 1 : 0)).toString(16)}`,
-            r: privyAuth.r,
-            s: privyAuth.s
-          }]
-        }]
+      const walletClient = createWalletClient({
+        account: wallet.address as `0x${string}`,
+        chain: baseSepolia,
+        transport: custom(provider),
       });
 
-      console.log('Transaction sent with hash:', hash);
+      console.log("Sending EIP-7702 transaction (type 4)...");
 
-      // Wait for confirmation and update status
+      // Send as EIP‑7702 (type: 4) with authorizationList
+      const hash = await walletClient.sendTransaction({
+        account: wallet.address as `0x${string}`,
+        to: wallet.address as `0x${string}`,
+        value: 0n,
+        type: "0x4", // ✅ Force type 4 (EIP-7702)
+        authorizationList: [viemAuthorization],
+      });
+
+      console.log("Transaction sent with hash:", hash);
+
+      // Wait for confirmation
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
-      console.log('Transaction receipt:', receipt);
-      console.log('Transaction type in receipt:', receipt.type);
+      console.log("Transaction receipt:", receipt);
+      console.log("Transaction type in receipt:", receipt.type);
 
-      // Check the code after transaction
+      // Check the code after delegation
       const codeAfter = await publicClient.getCode({
-        address: wallet.address as `0x${string}`
+        address: wallet.address as `0x${string}`,
       });
-      console.log('Code after delegation:', codeAfter);
+      console.log("Delegated?", codeAfter?.startsWith("0xef0100"));
 
       await checkDelegationStatus();
 
       return hash;
     } catch (error) {
-      console.error('Error delegating to contract:', error);
+      console.error("Error delegating to contract:", error);
       throw error;
     } finally {
       setLoading(false);
     }
   };
+
   // Revoke delegation using Privy's authorization
   const revokeDelegation = async () => {
     if (!wallet?.address) throw new Error('No wallet connected');
