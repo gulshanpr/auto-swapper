@@ -136,7 +136,6 @@ class EIP7702Demo {
       logInfo(`💰 Base ETH Balance: ${formatEther(balance)} ETH`);
 
       if (parseFloat(formatEther(balance)) < 0.01) {
-        logWarning('⚠️ Low ETH balance detected - switching to demo mode');
         logInfo('💡 Demo will focus on cross-chain swap functionality');
         logInfo('🎯 Perfect for showing core EIP-7702 + automated swap concepts');
       }
@@ -252,7 +251,6 @@ class EIP7702Demo {
       logSuccess(`🔑 Session key generated: ${this.sessionKey.address}`);
       logInfo(`🔐 Session private key: ${this.sessionKey.privateKey}`);
 
-      logWarning(`⚠️ Skipping on-chain session creation due to low ETH balance`);
       logInfo(`💡 In production, this would create an on-chain session with your contract`);
       logInfo(`📝 For demo purposes, we'll proceed with the cross-chain swap`);
       logInfo(`🎯 This demonstrates the core EIP-7702 + cross-chain functionality`);

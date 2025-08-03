@@ -22,11 +22,12 @@ export async function POST(req: NextRequest) {
     data: {
       user: { connect: { wallet: rule.user.wallet } },
       rule: { connect: { id: rule.id } },
-      txHash: '0xFAKE',
+      sourceTxHash: '0x00', // ✅ This exists in your schema
       status: 'pending',
       details: {},
     },
-  });
+  })
+
 
   return NextResponse.json({ logId: log.id });
 }

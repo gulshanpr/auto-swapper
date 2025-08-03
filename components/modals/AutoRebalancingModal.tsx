@@ -59,7 +59,7 @@ const AutoRebalancingModal = ({ open, onClose, delegationStatus, onSuccess }: Au
   const { wallets } = useWallets();
   const { setUserAddress } = useUserAddress();
   const { sessionAccount, isLoaded: isSessionLoaded } = useSessionAccount();
-  const { startSessionWithDelegation, delegationStatus: currentDelegationStatus, loading: isDelegating } = useEIP7702();
+  const { startSession, delegationStatus: currentDelegationStatus, loading: isDelegating } = useEIP7702();
 
   // Fetch balances when modal opens
   useEffect(() => {
@@ -158,7 +158,7 @@ const AutoRebalancingModal = ({ open, onClose, delegationStatus, onSuccess }: Au
       const gasFee = "0.001";
 
       // Call the REAL EIP-7702 function from useEIP7702 hook
-      const transactionHash = await startSessionWithDelegation({
+      const transactionHash = await startSession({
         sessionKey: sessionAccount.address,
         swapToken: fromToken === 'ETH' ? '0x0000000000000000000000000000000000000000' : fromToken,
         swapAmount,

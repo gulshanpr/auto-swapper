@@ -26,6 +26,8 @@ export interface SwapLog {
     status: string;
     actualAmountIn?: number;
     actualAmountOut?: number;
+    actualFees?: number;
+    actualSlippage?: number;
     timestamp: string;
     details?: any;
     rule: {

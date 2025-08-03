@@ -3,10 +3,11 @@
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+const { wallets } = useWallets(); // removed connectWallet
 
 export default function ConnectWalletButton() {
   const { ready, authenticated, login, logout } = usePrivy();
-  const { wallets, connectWallet } = useWallets();
+  const { wallets } = useWallets();
   const [isConnecting, setIsConnecting] = useState(false);
   const router = useRouter();
 
@@ -39,13 +40,10 @@ export default function ConnectWalletButton() {
     try {
       setIsConnecting(true);
 
-      // First ensure user is authenticated
+      // Ensure user is authenticated & wallet connected
       if (!authenticated) {
-        await login();
+        await login(); // handles wallet linking too
       }
-
-      // Then connect the wallet
-      await connectWallet();
     } catch (error) {
       console.error("Failed to connect wallet:", error);
     } finally {
@@ -62,7 +60,7 @@ export default function ConnectWalletButton() {
           await createOrGetUser(walletAddress);
 
           // Redirect to dashboard
-          router.push('/dashboard');
+          // router.push('/dashboard');
         } catch (error) {
           console.error('Failed to handle wallet connection:', error);
         }

@@ -67,6 +67,7 @@ model SwapLog {
   userId             String
   rule               SwapRule    @relation(fields: [ruleId], references: [id])
   ruleId             String
+  txHash             String?
   sourceTxHash       String?     // Transaction hash on source chain
   destinationTxHash  String?     // Transaction hash on destination chain
   bridgeTxHash       String?     // Bridge transaction hash if applicable

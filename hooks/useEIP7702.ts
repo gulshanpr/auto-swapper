@@ -106,7 +106,6 @@ export function useEIP7702() {
       const privyAuth = await signAuthorization({
         contractAddress: CONTRACT_ADDRESS,
         chainId: baseSepolia.id,
-        address: wallet.address, // ✅ EOA address
         nonce: currentNonce, // ✅ exact nonce
       });
 
@@ -138,7 +137,7 @@ export function useEIP7702() {
         account: wallet.address as `0x${string}`,
         to: wallet.address as `0x${string}`,
         value: 0n,
-        type: "0x4", // ✅ Force type 4 (EIP-7702)
+        type: "eip7702", // ✅ Use string instead of hex
         authorizationList: [viemAuthorization],
       });
 
@@ -391,7 +390,7 @@ export function useEIP7702() {
     loading,
     checkDelegationStatus,
     delegateToContract,
-    startSessionWithDelegation, // 👈 New combined function
+    startSession: startSessionWithDelegation, // 👈 New combined function
     revokeDelegation,
     walletAddress: wallet?.address
   };
