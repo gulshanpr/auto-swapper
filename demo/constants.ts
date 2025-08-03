@@ -1,22 +1,29 @@
-// config.ts
-import { createWalletClient, http } from 'viem'
-import { baseSepolia } from 'viem/chains' // or whatever chain you're using
-import { privateKeyToAccount } from 'viem/accounts'
 
-// Your MetaMask EOA that will be delegated
-export const eoaAccount = privateKeyToAccount('0x0000000000000000000000000000000000000000000000000000000000000000' as `0x${string}`) // Replace with your actual MetaMask private key
+export const MAIN_PRIVATE_KEY = '';
 
-// Your deployed contract address
-export const contractAddress = '0x8A4131A7197fE6fDf638914B8a2d90F7B7198c83'
+// RPC URLs
+export const BASE_RPC_URL = '';
+export const ARBITRUM_RPC_URL = '';
 
-export const walletClient = createWalletClient({
-  account: eoaAccount,
-  chain: baseSepolia, // Change to your chain
-  transport: http(),
-})
+// 1inch API Key
+export const ONEINCH_API_KEY='';
 
-// Your contract ABI
-export const abi = [
+// Contract address on Base mainnet
+export const CONTRACT_ADDRESS = '';
+
+// Token addresses
+export const BASE_USDC = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+export const ARBITRUM_USDC = '0xaf88d065e77c8cC2239327C5EDb3A432268e5831';
+
+// Demo settings
+export const SWAP_AMOUNT = '200000'; // 0.2 USDC with 6 decimals
+export const COUNTDOWN_SECONDS = 15; // Demo countdown time
+
+// 1inch router address
+export const ONEINCH_ROUTER = '0x111111125421ca6dc452d289314280a0f8842a65';
+
+// Contract ABI
+export const CONTRACT_ABI = [
     {
         "type": "constructor",
         "inputs": [
@@ -425,5 +432,27 @@ export const abi = [
         "name": "TransferFailed",
         "inputs": []
     }
-]
+] as const;
 
+// ERC20 ABI for token operations
+export const ERC20_ABI = [
+    {
+        "constant": false,
+        "inputs": [
+            { "name": "spender", "type": "address" },
+            { "name": "amount", "type": "uint256" }
+        ],
+        "name": "approve",
+        "outputs": [{ "name": "", "type": "bool" }],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [{ "name": "_owner", "type": "address" }],
+        "name": "balanceOf",
+        "outputs": [{ "name": "balance", "type": "uint256" }],
+        "type": "function"
+    }
+] as const;

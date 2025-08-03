@@ -44,5 +44,5 @@ async function checkDelegationStatus(eoaAddress: string) {
 }
 
 // Check your EOA - replace with your actual address
-checkDelegationStatus('0x49c4f4b258B715A4d50e6642F325946e62A6B7bA')
+checkDelegationStatus('0x4c290202594544b78E9049884D740fA5401092ea')
   .then(result => console.log('Final result:', result));

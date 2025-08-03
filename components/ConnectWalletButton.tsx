@@ -1,12 +1,39 @@
 "use client";
 
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ConnectWalletButton() {
   const { ready, authenticated, login, logout } = usePrivy();
   const { wallets, connectWallet } = useWallets();
   const [isConnecting, setIsConnecting] = useState(false);
+  const router = useRouter();
+
+  // Check if wallet is connected
+  const isWalletConnected = authenticated && wallets.length > 0 && wallets[0]?.address;
+
+  const createOrGetUser = async (walletAddress: string) => {
+    try {
+      const response = await fetch('/api/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ walletAddress }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create/get user');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error creating/getting user:', error);
+      throw error;
+    }
+  };
 
   const handleConnect = async () => {
     try {
@@ -26,8 +53,24 @@ export default function ConnectWalletButton() {
     }
   };
 
-  // Check if wallet is connected
-  const isWalletConnected = authenticated && wallets.length > 0 && wallets[0]?.address;
+  // Effect to handle user creation and redirect after wallet connection
+  useEffect(() => {
+    const handleWalletConnected = async () => {
+      if (isWalletConnected && wallets[0]?.address) {
+        try {
+          const walletAddress = wallets[0].address;
+          await createOrGetUser(walletAddress);
+
+          // Redirect to dashboard
+          router.push('/dashboard');
+        } catch (error) {
+          console.error('Failed to handle wallet connection:', error);
+        }
+      }
+    };
+
+    handleWalletConnected();
+  }, [isWalletConnected, wallets, router]);
 
   if (!ready) {
     return (
@@ -62,8 +105,8 @@ export default function ConnectWalletButton() {
       onClick={handleConnect}
       disabled={isConnecting}
       className={`font-semibold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform ${isConnecting
-          ? "bg-indigo-400 text-offwhite opacity-75 cursor-not-allowed"
-          : "bg-indigo-500 text-offwhite hover:bg-indigo-700 hover:scale-102 cursor-pointer"
+        ? "bg-indigo-400 text-offwhite opacity-75 cursor-not-allowed"
+        : "bg-indigo-500 text-offwhite hover:bg-indigo-700 hover:scale-102 cursor-pointer"
         }`}
     >
       {isConnecting ? "Connecting..." : "Connect wallet"}

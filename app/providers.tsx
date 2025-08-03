@@ -9,13 +9,16 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID as string}
       config={{
         embeddedWallets: {
-          createOnLogin: "all-users", // 👈 This should create embedded wallets
+          createOnLogin: "all-users", // Still create embedded wallets for your use case
           showWalletUIs: true,
         },
-        supportedChains: [baseSepolia], // 👈 Make sure Base Sepolia is included
-        loginMethods: ["email", "google"], // 👈 Use these, not external wallets
+        supportedChains: [baseSepolia],
+        loginMethods: ["email", "google", "wallet"],
         externalWallets: {
-          disableAllExternalWallets: true, // 👈 Disable external wallets
+          disableAllExternalWallets: false, // Set to false to ENABLE external wallets
+        },
+        appearance: {
+          walletList: ['metamask'], // Show MetaMask as an option
         },
       }}
     >

@@ -24,42 +24,57 @@ model User {
 }
 
 model SessionKey {
-  id           String      @id @default(uuid())
-  user         User        @relation(fields: [userId], references: [id])
-  userId       String
-  delegator    String
-  keyEncrypted String      // Store encrypted session key! (see note below)
-  validUntil   Int
-  actions      String[]    // e.g. ["SWAP"]
-  createdAt    DateTime    @default(now())
-  swapRules    SwapRule[]
+  id                String      @id @default(uuid())
+  user              User        @relation(fields: [userId], references: [id])
+  userId            String
+  delegator         String
+  keyEncrypted      String      // Store encrypted session private key
+  sessionKeyPublic  String      // Store session key address (public key)
+  validUntil        Int
+  actions           String[]    // e.g. ["SWAP"]
+  createdAt         DateTime    @default(now())
+  swapRules         SwapRule[]
 }
 
 model SwapRule {
-  id           String      @id @default(uuid())
-  user         User        @relation(fields: [userId], references: [id])
-  userId       String
-  sessionKey   SessionKey  @relation(fields: [sessionKeyId], references: [id])
-  sessionKeyId String
-  fromToken    String
-  toToken      String
-  percent      Float?
-  amount       Float?
-  frequency    String      // e.g. "weekly", "monthly"
-  nextExecution DateTime
-  active       Boolean     @default(true)
-  createdAt    DateTime    @default(now())
-  swapLogs     SwapLog[]
+  id              String      @id @default(uuid())
+  user            User        @relation(fields: [userId], references: [id])
+  userId          String
+  sessionKey      SessionKey  @relation(fields: [sessionKeyId], references: [id])
+  sessionKeyId    String
+  fromToken       String      // Token symbol (e.g., "USDC")
+  toToken         String      // Token symbol (e.g., "ETH")
+  fromChain       String      // Source chain (e.g., "Base Sepolia")
+  toChain         String      // Destination chain (e.g., "Ethereum Sepolia")
+  fromTokenAddress String?    // Contract address on source chain
+  toTokenAddress  String?     // Contract address on destination chain
+  percent         Float?
+  amount          Float?
+  estimatedValue  Float?      // USD value at time of creation
+  bridgeProtocol  String?     // Bridge/protocol to use (e.g., "Across", "Stargate")
+  maxSlippage     Float?      // Maximum acceptable slippage %
+  estimatedFees   Float?      // Estimated bridge/gas fees in USD
+  frequency       String      // e.g. "weekly", "monthly"
+  nextExecution   DateTime
+  active          Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  swapLogs        SwapLog[]
 }
 
 model SwapLog {
-  id           String      @id @default(uuid())
-  user         User        @relation(fields: [userId], references: [id])
-  userId       String
-  rule         SwapRule    @relation(fields: [ruleId], references: [id])
-  ruleId       String
-  txHash       String?
-  status       String      // "pending", "success", "failed"
-  timestamp    DateTime    @default(now())
-  details      Json?
+  id                 String      @id @default(uuid())
+  user               User        @relation(fields: [userId], references: [id])
+  userId             String
+  rule               SwapRule    @relation(fields: [ruleId], references: [id])
+  ruleId             String
+  sourceTxHash       String?     // Transaction hash on source chain
+  destinationTxHash  String?     // Transaction hash on destination chain
+  bridgeTxHash       String?     // Bridge transaction hash if applicable
+  status             String      // "pending", "bridging", "success", "failed"
+  actualAmountIn     Float?      // Actual amount swapped
+  actualAmountOut    Float?      // Actual amount received
+  actualFees         Float?      // Actual fees paid
+  actualSlippage     Float?      // Actual slippage experienced
+  timestamp          DateTime    @default(now())
+  details            Json?
 }

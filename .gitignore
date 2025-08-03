@@ -42,3 +42,4 @@ next-env.d.ts
 test
 /app/generated/prisma
 todo.txt
+/eip7702

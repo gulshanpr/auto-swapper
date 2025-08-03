@@ -1,14 +1,26 @@
 "use client";
 
 import Image from "next/image";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import ConnectWalletButton from "../ConnectWalletButton";
 
-const navItems = [
-  { label: "How It Works", href: "/#how-it-works" },
-  { label: "Features", href: "/#features" },
-];
-
 const Header = () => {
+  const { authenticated } = usePrivy();
+  const { wallets } = useWallets();
+
+  // Check if wallet is connected
+  const isWalletConnected = authenticated && wallets.length > 0 && wallets[0]?.address;
+
+  const baseNavItems = [
+    { label: "How It Works", href: "/#how-it-works" },
+    { label: "Features", href: "/#features" },
+  ];
+
+  // Add Dashboard to nav items only when wallet is connected
+  const navItems = isWalletConnected
+    ? [{ label: "Dashboard", href: "/dashboard" }, ...baseNavItems]
+    : baseNavItems;
+
   return (
     <header className="fixed top-0 left-0 right-0 bg-black/20 z-1 lg:z-20 backdrop-blur">
       <nav className="container mx-auto p-6 flex justify-between items-center">
